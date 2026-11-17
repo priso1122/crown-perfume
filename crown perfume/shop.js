@@ -1,4 +1,4 @@
-const fragrances = {
+const initialFragrances = {
     "silver-scent": {
         gender: "men",
         brand: "Jacques Bogart",
@@ -301,15 +301,46 @@ const fragrances = {
     }
 };
 
+const fragrances = {};
 const cartStorageKey = "crown-perfume-cart";
 
 function showShopMessage(message) {
-    const status = document.querySelector("#shop-message");
+    const status = document.querySelector("#shop-message, #admin-message");
     if (status) {
         status.textContent = message;
         return;
     }
     window.alert(message);
+}
+
+async function requestApi(path, options = {}) {
+    const response = await fetch(path, {
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json", ...options.headers },
+        ...options
+    });
+    const result = await response.json();
+    if (!response.ok) {
+        throw new Error(result.error || `The server returned ${response.status}.`);
+    }
+    return result;
+}
+
+async function loadFragrances() {
+    const savedCatalog = await requestApi("/api/catalog");
+    if (!savedCatalog || typeof savedCatalog !== "object" || Array.isArray(savedCatalog)) {
+        throw new Error("The server returned invalid catalog data.");
+    }
+    Object.keys(fragrances).forEach((id) => delete fragrances[id]);
+    Object.assign(fragrances, savedCatalog);
+    updateCartCount();
+    const wardrobeFragranceCount = document.querySelector("#wardrobe-fragrance-count");
+    if (wardrobeFragranceCount) {
+        wardrobeFragranceCount.textContent = String(Object.keys(fragrances).length);
+    }
+    renderProduct();
+    renderCart();
+    document.dispatchEvent(new Event("crown-catalog-ready"));
 }
 
 function readCart() {
@@ -504,5 +535,8 @@ function removeItem(id) {
 }
 
 updateCartCount();
-renderProduct();
-renderCart();
+const catalogReady = loadFragrances();
+catalogReady.catch((error) => {
+    showShopMessage("The fragrance database could not be reached. Start the Crown Perfume server and reload this page.");
+    console.error("Unable to load the Crown Perfume catalog.", error);
+});

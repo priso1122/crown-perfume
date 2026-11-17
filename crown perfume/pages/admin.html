@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#11120f">
+    <meta name="description" content="Manage the Crown Perfume fragrance catalog.">
+    <title>Administration — Crown Perfume</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/fragrances.css">
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+    <div class="topline">
+        <a href="../index.html">Return to Crown <span aria-hidden="true">↗</span></a>
+    </div>
+    <header class="site-header">
+        <button class="menu-toggle" type="button" aria-label="Open navigation menu" aria-expanded="false" aria-controls="primary-navigation">
+            <span></span><span></span>
+        </button>
+        <a class="brand" href="../index.html" aria-label="Crown Perfume home">
+            <span class="brand-crown" aria-hidden="true">♛</span>
+            <span class="brand-name">Crown</span>
+            <span class="brand-caption">Luxury fragrances</span>
+        </a>
+        <nav class="nav-links" id="primary-navigation" aria-label="Main navigation">
+            <a href="../index.html">Home</a>
+            <a href="fragrances.html">Shop</a>
+            <a href="forhim.html">For Him</a>
+            <a href="forher.html">For Her</a>
+            <a href="admin.html" aria-current="page">Administration</a>
+        </nav>
+        <a class="bag-link" href="cart.html" aria-label="Shopping bag">
+            <span class="bag-label">Bag</span><span class="cart-count">00</span>
+        </a>
+    </header>
+
+    <main class="admin-main">
+        <section class="admin-intro">
+            <p class="eyebrow"><span class="eyebrow-line"></span> Crown collection tools</p>
+            <h1>Store <em>administration.</em></h1>
+            <p>Manage fragrance details and create categories that appear in the For Him and For Her collections.</p>
+            <p class="admin-notice"><strong>Sign in required:</strong> Product and category changes are saved in the site's SQLite database and appear for all visitors using this server.</p>
+        </section>
+
+        <p id="admin-message" class="admin-message" role="status" aria-live="polite"></p>
+
+        <section id="login-panel" class="admin-panel login-panel" aria-labelledby="login-title">
+            <p class="eyebrow"><span class="eyebrow-line"></span> Owner access</p>
+            <h2 id="login-title">Sign in to continue</h2>
+            <form id="login-form">
+                <label for="login-username">Username</label>
+                <input id="login-username" name="username" type="text" autocomplete="username" value="peter" required>
+                <label for="login-password">Password</label>
+                <input id="login-password" name="password" type="password" autocomplete="current-password" required>
+                <button class="admin-button" type="submit">Sign in</button>
+            </form>
+        </section>
+
+        <div id="admin-workspace" hidden>
+        <div class="admin-layout">
+            <section class="admin-panel category-panel" aria-labelledby="categories-title">
+                <p class="eyebrow"><span class="eyebrow-line"></span> Organize the collection</p>
+                <h2 id="categories-title">Categories</h2>
+                <p class="admin-help">Assign categories while editing a fragrance. Products without one stay grouped by brand.</p>
+                <form id="category-form" class="category-form">
+                    <label for="category-name">New category</label>
+                    <div class="category-input-row">
+                        <input id="category-name" name="category" type="text" maxlength="60" required>
+                        <button class="admin-button" type="submit">Add category</button>
+                    </div>
+                </form>
+                <ul id="category-list" class="category-list"></ul>
+            </section>
+
+            <section class="admin-panel product-panel" aria-labelledby="product-form-title">
+                <p class="eyebrow"><span class="eyebrow-line"></span> Product editor</p>
+                <h2 id="product-form-title">Add a fragrance</h2>
+                <p class="admin-help">All product details are editable. Use an image path such as <code>../images/bottle.jpg</code> or a full image URL.</p>
+                <form id="product-form">
+                    <div class="admin-fields">
+                        <label>Product ID
+                            <input name="id" type="text" pattern="[a-z0-9]+(?:-[a-z0-9]+)*" title="Use lowercase letters, numbers, and hyphens." placeholder="example-fragrance" required>
+                        </label>
+                        <label>Collection
+                            <select name="gender" required>
+                                <option value="men">For Him</option>
+                                <option value="women">For Her</option>
+                            </select>
+                        </label>
+                        <label>Brand
+                            <input name="brand" type="text" required>
+                        </label>
+                        <label>Product name
+                            <input name="name" type="text" required>
+                        </label>
+                        <label class="field-wide">Category
+                            <select name="category" id="product-category">
+                                <option value="">Use brand as category</option>
+                            </select>
+                        </label>
+                        <label class="field-wide">Image path or URL
+                            <input name="image" type="text" placeholder="../images/fragrance.jpg" required>
+                        </label>
+                        <label class="field-wide">Image description (alt text)
+                            <input name="alt" type="text" required>
+                        </label>
+                        <label class="field-wide">Description
+                            <textarea name="description" rows="3" required></textarea>
+                        </label>
+                        <label>Scent character
+                            <textarea name="character" rows="2" required></textarea>
+                        </label>
+                        <label>Fragrance notes
+                            <textarea name="notes" rows="2" required></textarea>
+                        </label>
+                        <label class="field-wide">Ideal for
+                            <textarea name="occasion" rows="2" required></textarea>
+                        </label>
+                        <label class="field-wide">Product quote
+                            <textarea name="quote" rows="2" required></textarea>
+                        </label>
+                    </div>
+                    <div class="admin-actions">
+                        <button class="admin-button" type="submit">Save fragrance</button>
+                        <button class="admin-button secondary-button" id="clear-product-form" type="button">Clear form</button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="admin-panel product-list-panel" aria-labelledby="products-title">
+                <p class="eyebrow"><span class="eyebrow-line"></span> Current inventory</p>
+                <div class="inventory-heading">
+                    <h2 id="products-title">Fragrances <span id="product-total"></span></h2>
+                    <button class="admin-button secondary-button" id="logout-button" type="button">Sign out</button>
+                </div>
+                <div id="product-list" class="product-list"></div>
+            </section>
+        </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <a class="footer-brand" href="../index.html" aria-label="Crown Perfume home"><span aria-hidden="true">♛</span> CROWN</a>
+        <p>Fragrance, with intention.</p>
+        <nav class="footer-links" aria-label="Footer navigation">
+            <a href="../index.html">Home</a>
+            <a href="fragrances.html">Shop</a>
+            <a href="forhim.html">For Him</a>
+            <a href="forher.html">For Her</a>
+        </nav>
+        <span class="footer-copy">© 2026 CROWN PERFUME</span>
+    </footer>
+
+    <script src="../shop.js"></script>
+    <script src="admin.js"></script>
+    <script>
+        const menuToggle = document.querySelector(".menu-toggle");
+        const navigation = document.querySelector("#primary-navigation");
+        menuToggle.addEventListener("click", () => {
+            const isOpen = navigation.classList.toggle("is-open");
+            menuToggle.setAttribute("aria-expanded", String(isOpen));
+            menuToggle.setAttribute("aria-label", isOpen ? "Close navigation menu" : "Open navigation menu");
+        });
+        navigation.querySelectorAll("a").forEach((link) => {
+            link.addEventListener("click", () => {
+                navigation.classList.remove("is-open");
+                menuToggle.setAttribute("aria-expanded", "false");
+                menuToggle.setAttribute("aria-label", "Open navigation menu");
+            });
+        });
+    </script>
+</body>
+</html>

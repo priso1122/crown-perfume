@@ -40,24 +40,25 @@ function renderFragranceCategory(gender) {
     const container = document.querySelector(`#${gender}-products`);
     const products = Object.entries(fragrances)
         .filter(([, fragrance]) => fragrance.gender === gender);
-    const brands = new Map();
+    const categories = new Map();
 
     products.forEach(([id, fragrance]) => {
-        const group = brands.get(fragrance.brand) || [];
+        const category = fragrance.category || fragrance.brand;
+        const group = categories.get(category) || [];
         group.push({ id, fragrance });
-        brands.set(fragrance.brand, group);
+        categories.set(category, group);
     });
 
     let number = gender === "men" ? 0 : Object.values(fragrances).filter((item) => item.gender === "men").length;
     let singleProducts;
-    brands.forEach((items, brandName) => {
+    categories.forEach((items, categoryName) => {
         const group = document.createElement("section");
         group.className = "brand-group";
 
-        if (items.length > 1) {
+        if (items.length > 1 || items[0].fragrance.category) {
             const heading = document.createElement("h3");
             heading.className = "brand-group-title";
-            heading.textContent = brandName;
+            heading.textContent = categoryName;
             group.append(heading);
         } else {
             if (!singleProducts) {
@@ -88,14 +89,18 @@ function renderFragranceCategory(gender) {
     }
 }
 
-const selectedGender = document.body.dataset.gender;
-const fragranceCount = selectedGender
-    ? Object.values(fragrances).filter((fragrance) => fragrance.gender === selectedGender).length
-    : Object.keys(fragrances).length;
-document.querySelector("#catalog-count").textContent = `${String(fragranceCount).padStart(2, "0")} FRAGRANCES`;
-if (selectedGender) {
-    renderFragranceCategory(selectedGender);
-} else {
-    renderFragranceCategory("men");
-    renderFragranceCategory("women");
+function renderCatalog() {
+    const selectedGender = document.body.dataset.gender;
+    const fragranceCount = selectedGender
+        ? Object.values(fragrances).filter((fragrance) => fragrance.gender === selectedGender).length
+        : Object.keys(fragrances).length;
+    document.querySelector("#catalog-count").textContent = `${String(fragranceCount).padStart(2, "0")} FRAGRANCES`;
+    if (selectedGender) {
+        renderFragranceCategory(selectedGender);
+    } else {
+        renderFragranceCategory("men");
+        renderFragranceCategory("women");
+    }
 }
+
+document.addEventListener("crown-catalog-ready", renderCatalog, { once: true });
